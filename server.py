@@ -59,6 +59,7 @@ def main():
         try:
             message = get_message(client, CONFIGS)
             response = handle_message(message)
+            print(message)
             send_message(client, response, CONFIGS)
             client.close()
         except (ValueError, json.JSONDecodeError):

@@ -1,12 +1,13 @@
+#!/usr/bin/env python3
 import sys
 import os
 import unittest
-from client import CONFIGS, create_presence_message, handle_response
+
+from client import create_presence_message, handle_response
 from utils import load_configs
 
-print(sys.path)
 sys.path.append(os.path.join(os.getcwd(), '..'))
-print(sys.path)
+# print(sys.path)
 
 
 class TestClass(unittest.TestCase):
@@ -40,7 +41,7 @@ class TestClass(unittest.TestCase):
             handle_response({
                 self.CONFIGS['RESPONSE']: 400,
                 self.CONFIGS['ERROR']: 'Bad Request'
-            }),
+            }, self.CONFIGS),
             '400 : Bad Request'
         )
 

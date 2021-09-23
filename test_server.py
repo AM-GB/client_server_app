@@ -10,7 +10,7 @@ class TestServer(unittest.TestCase):
     CONFIGS = load_configs(True)
 
     error_message = {
-        CONFIGS['RESPONS']: 400,
+        CONFIGS['RESPONSE']: 400,
         CONFIGS['ERROR']: 'Bad Request'
     }
     success_message = {CONFIGS['RESPONSE']: 200}

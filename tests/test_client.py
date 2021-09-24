@@ -1,13 +1,10 @@
-#!/usr/bin/env python3
 import sys
 import os
 import unittest
-
 from client import create_presence_message, handle_response
 from utils import load_configs
 
 sys.path.append(os.path.join(os.getcwd(), '..'))
-# print(sys.path)
 
 
 class TestClass(unittest.TestCase):
@@ -15,8 +12,7 @@ class TestClass(unittest.TestCase):
 
     def test_presence(self):
         test = create_presence_message('Guest', CONFIGS=self.CONFIGS)
-        # время необходимо прировлянять принудительно
-        test[self.CONFIGS['TIME']] = 1.1
+        test[self.CONFIGS['TIME']] = 1.1  # время необходимо приравнять принудительно
         # иначе тест никогда не будет пройден
         self.assertEqual(
             test,
@@ -26,7 +22,6 @@ class TestClass(unittest.TestCase):
                 self.CONFIGS['USER']: {
                     self.CONFIGS['ACCOUNT_NAME']: 'Guest'
                 }
-
             }
         )
 
@@ -41,7 +36,7 @@ class TestClass(unittest.TestCase):
             handle_response({
                 self.CONFIGS['RESPONSE']: 400,
                 self.CONFIGS['ERROR']: 'Bad Request'
-            }, self.CONFIGS),
+            },self.CONFIGS),
             '400 : Bad Request'
         )
 

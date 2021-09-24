@@ -1,15 +1,14 @@
-import logging
-import os
 import sys
+import os
+import logging
 
-from utils import load_configs
+from utils.utils import load_configs
 
 sys.path.append('../')
 
 CONFIGS = load_configs()
 
-CLIENT_FORMATTER = logging.Formatter(
-    '%(asctime)s %(levelname)s %(filename)s %(message)s')
+CLIENT_FORMATTER = logging.Formatter('%(asctime)s %(levelname)s %(filename)s %(message)s')
 
 PATH = os.path.dirname(os.path.abspath(__file__))
 PATH = os.path.join(PATH, 'client.log')
@@ -24,7 +23,6 @@ LOGGER = logging.getLogger('client')
 LOGGER.addHandler(STREAM_HANDLER)
 LOGGER.addHandler(LOG_FILE)
 LOGGER.setLevel(CONFIGS.get('LOGGING_LEVEL', logging.DEBUG))
-
 
 if __name__ == '__main__':
     LOGGER.critical('Критическая ошибка')

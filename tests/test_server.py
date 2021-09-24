@@ -1,5 +1,3 @@
-from client import CONFIGS, handle_response
-from logging import error
 import unittest
 
 from server import handle_message

@@ -28,7 +28,8 @@ def create_presence_message(CONFIGS, account_name='Guest'):
 
 
 def get_user_message(sock, CONFIGS, account_name='Guest'):
-    message = input('Введите сообщение для отправки или \'!!!\' для завершения работы: ')
+    message = input(
+        'Введите сообщение для отправки или \'!!!\' для завершения работы: ')
     if message == '!!!':
         sock.close()
         SERVER_LOGGER.info('Завершение работы по команде пользователя.')
@@ -50,16 +51,19 @@ def handle_server_message(message, CONFIG):
         print(f'Получено сообщение от пользователя '
               f'{message[CONFIG["SENDER"]]}:\n{message[CONFIG["MESSAGE_TEXT"]]}')
         SERVER_LOGGER.info(f'Получено сообщение от пользователя '
-                    f'{message[CONFIG["SENDER"]]}:\n{message[CONFIG["MESSAGE_TEXT"]]}')
+                           f'{message[CONFIG["SENDER"]]}:\n{message[CONFIG["MESSAGE_TEXT"]]}')
     else:
-        SERVER_LOGGER.error(f'Получено некорректное сообщение с сервера: {message}')
+        SERVER_LOGGER.error(
+            f'Получено некорректное сообщение с сервера: {message}')
 
 
 @Log()
 def arg_parser(CONFIGS):
     parser = argparse.ArgumentParser()
-    parser.add_argument('addr', default=CONFIGS['DEFAULT_IP_ADDRESS'], nargs='?')
-    parser.add_argument('port', default=CONFIGS['DEFAULT_PORT'], type=int, nargs='?')
+    parser.add_argument(
+        'addr', default=CONFIGS['DEFAULT_IP_ADDRESS'], nargs='?')
+    parser.add_argument(
+        'port', default=CONFIGS['DEFAULT_PORT'], type=int, nargs='?')
     parser.add_argument('-m', '--mode', default='listen', nargs='?')
     namespace = parser.parse_args(sys.argv[1:])
     server_address = namespace.addr
@@ -67,11 +71,13 @@ def arg_parser(CONFIGS):
     client_mode = namespace.mode
 
     if not 1023 < server_port < 65536:
-        SERVER_LOGGER.critical('Порт должен быть указан в пределах от 1024 до 65535')
+        SERVER_LOGGER.critical(
+            'Порт должен быть указан в пределах от 1024 до 65535')
         sys.exit(1)
 
     if client_mode not in ('listen', 'send'):
-        SERVER_LOGGER.critical(f'Указан недопустимый режим работы {client_mode}, допустимые режимы: listen , send')
+        SERVER_LOGGER.critical(
+            f'Указан недопустимый режим работы {client_mode}, допустимые режимы: listen , send')
         sys.exit(1)
 
     return server_address, server_port, client_mode
@@ -96,25 +102,31 @@ def main():
     try:
         transport = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         transport.connect((server_address, server_port))
-        send_message(transport, create_presence_message(CONFIGS), CONFIGS)
-        answer = handle_response(get_message(transport, CONFIGS), CONFIGS)
         print(client_mode)
-        SERVER_LOGGER.info(f'Установлено соединение с сервером. Ответ сервера: {answer}')
+        send_message(transport, create_presence_message(CONFIGS), CONFIGS)
+        # answer = handle_response(get_message(transport, CONFIGS), CONFIGS)
+        # print(client_mode)
+        # SERVER_LOGGER.info(
+        #     f'Установлено соединение с сервером. Ответ сервера: {answer}')
         print(f'Установлено соединение с сервером.')
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
         SERVER_LOGGER.error('Не удалось декодировать полученную Json строку.')
         sys.exit(1)
     except ServerError as error:
-        SERVER_LOGGER.error(f'При установке соединения сервер вернул ошибку: {error.text}')
+        SERVER_LOGGER.error(
+            f'При установке соединения сервер вернул ошибку: {error.text}')
         sys.exit(1)
     except ReqFieldMissingError as missing_error:
-        SERVER_LOGGER.error(f'В ответе сервера отсутствует необходимое поле {missing_error.missing_field}')
+        SERVER_LOGGER.error(
+            f'В ответе сервера отсутствует необходимое поле {missing_error.missing_field}')
         sys.exit(1)
     except ConnectionRefusedError:
         SERVER_LOGGER.critical(
             f'Не удалось подключиться к серверу {server_address}:{server_port}, '
             f'конечный компьютер отверг запрос на подключение.')
         sys.exit(1)
+    except Exception as e:
+        print(e)
     else:
         if client_mode == 'send':
             print('Режим работы - отправка сообщений.')
@@ -124,16 +136,21 @@ def main():
             print(client_mode)
             if client_mode == 'send':
                 try:
-                    send_message(transport, get_user_message(transport, CONFIGS), CONFIGS)
+                    send_message(transport, get_user_message(
+                        transport, CONFIGS), CONFIGS)
                 except (ConnectionResetError, ConnectionError, ConnectionAbortedError):
-                    SERVER_LOGGER.error(f'Соединение с сервером {server_address} было потеряно.')
+                    SERVER_LOGGER.error(
+                        f'Соединение с сервером {server_address} было потеряно.')
                     sys.exit(1)
 
             if client_mode == 'listen':
                 try:
-                    handle_server_message(get_message(transport, CONFIGS), CONFIGS)
+                    message = get_message(transport, CONFIGS)
+                    print(message)
+                    handle_server_message(message, CONFIGS)
                 except (ConnectionResetError, ConnectionError, ConnectionAbortedError):
-                    SERVER_LOGGER.error(f'Соединение с сервером {server_address} было потеряно.')
+                    SERVER_LOGGER.error(
+                        f'Соединение с сервером {server_address} было потеряно.')
                     sys.exit(1)
 
 

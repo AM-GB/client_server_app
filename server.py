@@ -35,7 +35,8 @@ def handle_message(message, messages_list, client, CONFIGS):
 def arg_parser(CONFIGS):
     global SERVER_LOGGER
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', default=CONFIGS['DEFAULT_PORT'], type=int, nargs='?')
+    parser.add_argument(
+        '-p', default=CONFIGS['DEFAULT_PORT'], type=int, nargs='?')
     parser.add_argument('-a', default='', nargs='?')
     namespace = parser.parse_args(sys.argv[1:])
     listen_address = namespace.a
@@ -53,7 +54,8 @@ def main():
     global CONFIGS, SERVER_LOGGER
     CONFIGS = load_configs()
     listen_address, listen_port = arg_parser(CONFIGS)
-    SERVER_LOGGER.info(f'Сервер запущен на порту: {listen_port}, по адресу: {listen_address}.')
+    SERVER_LOGGER.info(
+        f'Сервер запущен на порту: {listen_port}, по адресу: {listen_address}.')
 
     transport = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     transport.bind((listen_address, listen_port))
@@ -67,30 +69,42 @@ def main():
     while True:
         try:
             client, client_address = transport.accept()
-        except OSError:
+        except OSError as e:
+            # print(e)
             pass
         else:
             SERVER_LOGGER.info(f'Установлено соедение с ПК {client_address}')
             clients.append(client)
+            print(client)
 
         recv_data_lst = []
         send_data_lst = []
         err_lst = []
         try:
             if clients:
-                recv_data_lst, send_data_lst, err_lst = select.select(clients, clients, [], 0)
-        except OSError:
-            pass
+                recv_data_lst, send_data_lst, err_lst = select.select(
+                    clients, clients, [], 0)
+
+        except OSError as e:
+            print(e)
+            # pass
 
         if recv_data_lst:
+            print('*' * 50)
+            print(recv_data_lst)
+            print('s'*10)
+            print(send_data_lst)
             for client_with_message in recv_data_lst:
                 try:
-                    handle_message(get_message(client_with_message, CONFIGS), messages, client_with_message, CONFIGS)
+                    handle_message(get_message(
+                        client_with_message, CONFIGS), messages, client_with_message, CONFIGS)
                 except:
-                    SERVER_LOGGER.info(f'Клиент {client_with_message.getpeername()} отключился от сервера.')
+                    SERVER_LOGGER.info(
+                        f'Клиент {client_with_message.getpeername()} отключился от сервера.')
                     clients.remove(client_with_message)
 
         if messages and send_data_lst:
+            print('send message')
             message = {
                 CONFIGS['ACTION']: CONFIGS['MESSAGE'],
                 CONFIGS['SENDER']: messages[0][0],
@@ -102,7 +116,8 @@ def main():
                 try:
                     send_message(waiting_client, message, CONFIGS)
                 except:
-                    SERVER_LOGGER.info(f'Клиент {waiting_client.getpeername()} отключился от сервера.')
+                    SERVER_LOGGER.info(
+                        f'Клиент {waiting_client.getpeername()} отключился от сервера.')
                     clients.remove(waiting_client)
 
 

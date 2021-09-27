@@ -11,7 +11,5 @@
   "PRESENCE": "presence",
   "RESPONSE": "response",
   "ERROR": "error",
-  "LOGGING_LEVEL": 10,
-  "MESSAGE": "msg",
-  "MESSAGE_TEXT": "message"
+  "LOGGING_LEVEL": 10
 }

@@ -192,3 +192,7 @@
 2021-09-29 20:20:30,389 INFO client.py Отправлено сообщение для пользователя 007
 2021-09-29 20:20:30,568 INFO client.py Получено сообщение от пользователя {'response': 400, 'error': 'Bad Request'}:
 {'response': 400, 'error': 'Bad Request'}
+2021-09-29 20:36:21,565 DEBUG client.py Сформирован словарь сообщения: {'action': 'msg', 'from': '', 'time': 1632936981.5654113, 'message': 'asdas'}
+2021-09-29 20:36:21,565 INFO client.py Отправлено сообщение для пользователя sada
+2021-09-29 20:36:21,904 INFO client.py Получено сообщение от пользователя {'response': 400, 'error': 'Bad Request'}:
+{'response': 400, 'error': 'Bad Request'}

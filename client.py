@@ -45,7 +45,8 @@ def create_presence_message(CONFIGS, account_name='Guest'):
 
 
 def get_user_message(sock, CONFIGS, account_name='Guest'):
-    message = input('Введите сообщение для отправки или \'!!!\' для завершения работы: ')
+    message = input(
+        'Введите сообщение для отправки или \'!!!\' для завершения работы: ')
     if message == '!!!':
         sock.close()
         SERVER_LOGGER.info('Завершение работы по команде пользователя.')
@@ -67,7 +68,7 @@ def create_message(sock, account_name='Guest'):
     message_dict = {
         CONFIGS['ACTION']: CONFIGS['MESSAGE'],
         CONFIGS['SENDER']: account_name,
-        CONFIGS['DESTINATION']: to_user,
+        # CONFIGS['DESTINATION']: to_user,
         CONFIGS['TIME']: time.time(),
         CONFIGS['MESSAGE_TEXT']: message
     }
@@ -86,16 +87,19 @@ def handle_server_message(message, CONFIG):
         print(f'Получено сообщение от пользователя '
               f'{message[CONFIG["SENDER"]]}:\n{message[CONFIG["MESSAGE_TEXT"]]}')
         SERVER_LOGGER.info(f'Получено сообщение от пользователя '
-                    f'{message[CONFIG["SENDER"]]}:\n{message[CONFIG["MESSAGE_TEXT"]]}')
+                           f'{message[CONFIG["SENDER"]]}:\n{message[CONFIG["MESSAGE_TEXT"]]}')
     else:
-        SERVER_LOGGER.error(f'Получено некорректное сообщение с сервера: {message}')
+        SERVER_LOGGER.error(
+            f'Получено некорректное сообщение с сервера: {message}')
 
 
 @Log()
 def arg_parser(CONFIGS):
     parser = argparse.ArgumentParser()
-    parser.add_argument('addr', default=CONFIGS['DEFAULT_IP_ADDRESS'], nargs='?')
-    parser.add_argument('port', default=CONFIGS['DEFAULT_PORT'], type=int, nargs='?')
+    parser.add_argument(
+        'addr', default=CONFIGS['DEFAULT_IP_ADDRESS'], nargs='?')
+    parser.add_argument(
+        'port', default=CONFIGS['DEFAULT_PORT'], type=int, nargs='?')
     parser.add_argument('-m', '--mode', default='listen', nargs='?')
     namespace = parser.parse_args(sys.argv[1:])
     server_address = namespace.addr
@@ -103,11 +107,13 @@ def arg_parser(CONFIGS):
     client_mode = namespace.mode
 
     if not 1023 < server_port < 65536:
-        SERVER_LOGGER.critical('Порт должен быть указан в пределах от 1024 до 65535')
+        SERVER_LOGGER.critical(
+            'Порт должен быть указан в пределах от 1024 до 65535')
         sys.exit(1)
 
     if client_mode not in ('listen', 'send'):
-        SERVER_LOGGER.critical(f'Указан недопустимый режим работы {client_mode}, допустимые режимы: listen , send')
+        SERVER_LOGGER.critical(
+            f'Указан недопустимый режим работы {client_mode}, допустимые режимы: listen , send')
         sys.exit(1)
 
     return server_address, server_port, client_mode
@@ -130,17 +136,21 @@ def message_from_server(sock, my_username):
     while True:
         try:
             message = get_message(sock, CONFIGS)
-            if CONFIGS['ACTION'] in message and message[CONFIGS['ACTION']] == CONFIGS['MESSAGE'] and \
-                    CONFIGS['SENDER'] in message and CONFIGS['DESTINATION'] in message \
-                    and CONFIGS['MESSAGE_TEXT'] in message and message[CONFIGS['DESTINATION']] == my_username:
-                print(f'\nПолучено сообщение от пользователя {message[CONFIGS["SENDER"]]}:'
-                      f'\n{message[CONFIGS["MESSAGE_TEXT"]]}')
+            # print(message)
+            if CONFIGS['ACTION'] in message \
+                    and message[CONFIGS['ACTION']] == CONFIGS['MESSAGE'] \
+                    and CONFIGS['SENDER'] in message \
+                    and CONFIGS['MESSAGE_TEXT']:
+                # print(f'\nПолучено сообщение от пользователя {message[CONFIGS["SENDER"]]}:'
+                #       f'\n{message[CONFIGS["MESSAGE_TEXT"]]}')
                 SERVER_LOGGER.info(f'Получено сообщение от пользователя {message[CONFIGS["SENDER"]]}:'
-                            f'\n{message[CONFIGS["MESSAGE_TEXT"]]}')
+                                   f'\n{message[CONFIGS["MESSAGE_TEXT"]]}')
             else:
-                SERVER_LOGGER.error(f'Получено некорректное сообщение с сервера: {message}')
+                SERVER_LOGGER.error(
+                    f'Получено некорректное сообщение с сервера: {message}')
         except IncorrectDataRecivedError:
-            SERVER_LOGGER.error(f'Не удалось декодировать полученное сообщение.')
+            SERVER_LOGGER.error(
+                f'Не удалось декодировать полученное сообщение.')
         except (OSError, ConnectionError, ConnectionAbortedError,
                 ConnectionResetError, json.JSONDecodeError):
             SERVER_LOGGER.critical(f'Потеряно соединение с сервером.')
@@ -162,7 +172,8 @@ def user_interactive(sock, username):
             time.sleep(0.5)
             break
         else:
-            print('Команда не распознана, попробойте снова. help - вывести поддерживаемые команды.')
+            print(
+                'Команда не распознана, попробойте снова. help - вывести поддерживаемые команды.')
 
 
 def main():
@@ -174,16 +185,19 @@ def main():
         transport.connect((server_address, server_port))
         send_message(transport, create_presence_message(CONFIGS), CONFIGS)
         answer = handle_response(get_message(transport, CONFIGS), CONFIGS)
-        SERVER_LOGGER.info(f'Установлено соединение с сервером. Ответ сервера: {answer}')
+        SERVER_LOGGER.info(
+            f'Установлено соединение с сервером. Ответ сервера: {answer}')
         print(f'Установлено соединение с сервером.')
     except json.JSONDecodeError:
         SERVER_LOGGER.error('Не удалось декодировать полученную Json строку.')
         sys.exit(1)
     except ServerError as error:
-        SERVER_LOGGER.error(f'При установке соединения сервер вернул ошибку: {error.text}')
+        SERVER_LOGGER.error(
+            f'При установке соединения сервер вернул ошибку: {error.text}')
         sys.exit(1)
     except ReqFieldMissingError as missing_error:
-        SERVER_LOGGER.error(f'В ответе сервера отсутствует необходимое поле {missing_error.missing_field}')
+        SERVER_LOGGER.error(
+            f'В ответе сервера отсутствует необходимое поле {missing_error.missing_field}')
         sys.exit(1)
     except ConnectionRefusedError:
         SERVER_LOGGER.critical(
@@ -192,34 +206,16 @@ def main():
         sys.exit(1)
     else:
         client_name = ''
-        receiver = threading.Thread(target=message_from_server, args=(transport, client_name))
-        receiver.daemon = True
+        receiver = threading.Thread(
+            target=message_from_server, args=(transport, client_name))
+        # receiver.daemon = True
         receiver.start()
 
-        user_interface = threading.Thread(target=user_interactive, args=(transport, client_name))
-        user_interface.daemon = True
+        user_interface = threading.Thread(
+            target=user_interactive, args=(transport, client_name))
+        # user_interface.daemon = True
         user_interface.start()
         SERVER_LOGGER.debug('Запущены процессы')
-
-        # if client_mode == 'send':
-        #     print('Режим работы - отправка сообщений.')
-        # else:
-        #     print('Режим работы - приём сообщений.')
-        # while True:
-        #
-        #     if client_mode == 'send':
-        #         try:
-        #             send_message(transport, get_user_message(transport, CONFIGS), CONFIGS)
-        #         except (ConnectionResetError, ConnectionError, ConnectionAbortedError):
-        #             SERVER_LOGGER.error(f'Соединение с сервером {server_address} было потеряно.')
-        #             sys.exit(1)
-        #
-        #     if client_mode == 'listen':
-        #         try:
-        #             handle_server_message(get_message(transport, CONFIGS), CONFIGS)
-        #         except (ConnectionResetError, ConnectionError, ConnectionAbortedError):
-        #             SERVER_LOGGER.error(f'Соединение с сервером {server_address} было потеряно.')
-        #             sys.exit(1)
 
 
 if __name__ == '__main__':
